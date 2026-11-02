@@ -13,8 +13,8 @@ resource "aws_key_pair" "utc_key" {
 
 #save private key to file in .pem
 resource "local_file" "utc_key" {
-  content  = tls_private_key.utc_key.private_key_pem
-  filename = "./utc-key.pem"
+  content         = tls_private_key.utc_key.private_key_pem
+  filename        = "./utc-key.pem"
   file_permission = "0600"
 }
 
