@@ -23,7 +23,7 @@ data "aws_ami" "amazon_linux2" {
 # create bastion host
 resource "aws_instance" "bastion" {
   ami                         = data.aws_ami.amazon_linux.id
-  instance_type               = "t2.micro"
+  instance_type               = "t3.micro"
   key_name                    = aws_key_pair.utc_key.key_name
   subnet_id                   = aws_subnet.subnet_public_1.id
   vpc_security_group_ids      = [aws_security_group.bastion_sg.id]
@@ -62,12 +62,12 @@ resource "aws_instance" "bastion" {
 
 resource "aws_instance" "ec2_instance1" {
   ami                         = data.aws_ami.amazon_linux2.id
-  instance_type               = "t2.micro"
+  instance_type               = "t3.micro"
   key_name                    = aws_key_pair.utc_key.key_name
   subnet_id                   = aws_subnet.subnet_private_1.id
   vpc_security_group_ids      = [aws_security_group.app_server_sg.id]
   associate_public_ip_address = false
-  user_data = <<-EOF
+  user_data                   = <<-EOF
 #!/bin/bash
 yum update -y
 yum install -y httpd.x86_64
@@ -76,22 +76,22 @@ systemctl enable httpd.service
 echo "Hello World from $(hostname -f)" > /var/www/html/index.html
 EOF
 
-    tags = {
+  tags = {
     Name = "appserver-1a"
-    env  = "dev"    
+    env  = "dev"
     team = "config management"
 
-    }
+  }
 }
 
 resource "aws_instance" "ec2_instance2" {
   ami                         = data.aws_ami.amazon_linux2.id
-  instance_type               = "t2.micro"
+  instance_type               = "t3.micro"
   key_name                    = aws_key_pair.utc_key.key_name
   subnet_id                   = aws_subnet.subnet_private_2.id
   vpc_security_group_ids      = [aws_security_group.app_server_sg.id]
   associate_public_ip_address = false
-  user_data = <<-EOF
+  user_data                   = <<-EOF
 #!/bin/bash
 yum update -y
 yum install -y httpd.x86_64
@@ -100,10 +100,10 @@ systemctl enable httpd.service
 echo "Hello World from $(hostname -f)" > /var/www/html/index.html
 EOF
 
-    tags = {
+  tags = {
     Name = "appserver-1b"
-    env  = "dev"    
+    env  = "dev"
     team = "config management"
 
-    }
+  }
 }
