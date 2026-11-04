@@ -61,6 +61,8 @@ resource "aws_instance" "bastion" {
 # create ec2 instance
 
 resource "aws_instance" "ec2_instance1" {
+
+  iam_instance_profile        = aws_iam_instance_profile.utc_ec2_profile.name
   ami                         = data.aws_ami.amazon_linux2.id
   instance_type               = "t3.micro"
   key_name                    = aws_key_pair.utc_key.key_name
@@ -85,6 +87,8 @@ EOF
 }
 
 resource "aws_instance" "ec2_instance2" {
+
+  iam_instance_profile        = aws_iam_instance_profile.utc_ec2_profile.name
   ami                         = data.aws_ami.amazon_linux2.id
   instance_type               = "t3.micro"
   key_name                    = aws_key_pair.utc_key.key_name

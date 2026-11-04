@@ -172,3 +172,45 @@ resource "aws_route_table_association" "private_rt_assoc_6" {
   subnet_id      = aws_subnet.subnet_private_6.id
   route_table_id = aws_route_table.private_rt_1.id
 }
+
+
+# create rds instance
+
+resource "aws_db_subnet_group" "rds_subnet_group" {
+  name = "utc-db-subnet-group"
+  subnet_ids = [
+    aws_subnet.subnet_private_3.id,
+    aws_subnet.subnet_private_4.id,
+  ]
+
+
+  tags = {
+    env  = "dev"
+    team = "config management"
+  }
+}
+
+
+resource "aws_db_instance" "rds_instance" {
+
+  identifier           = "utc-dev-database"
+  allocated_storage    = 20
+  storage_type         = "gp2"
+  engine               = "mysql"
+  engine_version       = "8.4"
+  instance_class       = "db.t3.micro"
+  db_name              = "utc_dev_database"
+  username             = "utcuser"
+  password             = var.db_password
+  parameter_group_name = "default.mysql8.4"
+  skip_final_snapshot  = true
+  publicly_accessible  = false
+  vpc_security_group_ids = [
+    aws_security_group.database_sg.id
+  ]
+  db_subnet_group_name = aws_db_subnet_group.rds_subnet_group.name
+  tags = {
+    env  = "dev"
+    team = "config management"
+  }
+} 
