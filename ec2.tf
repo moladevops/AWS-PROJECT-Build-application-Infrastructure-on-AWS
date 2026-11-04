@@ -69,6 +69,7 @@ resource "aws_instance" "ec2_instance1" {
   subnet_id                   = aws_subnet.subnet_private_1.id
   vpc_security_group_ids      = [aws_security_group.app_server_sg.id]
   associate_public_ip_address = false
+  user_data_replace_on_change = true
   user_data                   = <<-EOF
 #!/bin/bash
 yum update -y
@@ -76,7 +77,20 @@ yum install -y httpd.x86_64
 systemctl start httpd.service
 systemctl enable httpd.service
 echo "Hello World from $(hostname -f)" > /var/www/html/index.html
+yum install -y amazon-efs-utils
+mkdir -p /mnt/efs
+mount -t efs ${aws_efs_file_system.efs.id}:/ /mnt/efs
+echo "${aws_efs_file_system.efs.id}:/ /mnt/efs efs defaults,_netdev 0 0" >> /etc/fstab
 EOF
+
+  depends_on = [
+    aws_nat_gateway.nat_gateway_1,
+    aws_nat_gateway.nat_gateway_2,
+    aws_route_table_association.private_rt_assoc_1,
+    aws_route_table_association.private_rt_assoc_2,
+    aws_efs_mount_target.efs_mount_target_1,
+    aws_efs_mount_target.efs_mount_target_2,
+  ]
 
   tags = {
     Name = "appserver-1a"
@@ -95,6 +109,7 @@ resource "aws_instance" "ec2_instance2" {
   subnet_id                   = aws_subnet.subnet_private_2.id
   vpc_security_group_ids      = [aws_security_group.app_server_sg.id]
   associate_public_ip_address = false
+  user_data_replace_on_change = true
   user_data                   = <<-EOF
 #!/bin/bash
 yum update -y
@@ -102,7 +117,19 @@ yum install -y httpd.x86_64
 systemctl start httpd.service
 systemctl enable httpd.service
 echo "Hello World from $(hostname -f)" > /var/www/html/index.html
+yum install -y amazon-efs-utils
+mkdir -p /mnt/efs
+mount -t efs ${aws_efs_file_system.efs.id}:/ /mnt/efs
+echo "${aws_efs_file_system.efs.id}:/ /mnt/efs efs defaults,_netdev 0 0" >> /etc/fstab
 EOF
+  depends_on = [
+    aws_nat_gateway.nat_gateway_1,
+    aws_nat_gateway.nat_gateway_2,
+    aws_route_table_association.private_rt_assoc_1,
+    aws_route_table_association.private_rt_assoc_2,
+    aws_efs_mount_target.efs_mount_target_1,
+    aws_efs_mount_target.efs_mount_target_2,
+  ]
 
   tags = {
     Name = "appserver-1b"
