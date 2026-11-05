@@ -81,6 +81,8 @@ yum install -y amazon-efs-utils
 mkdir -p /mnt/efs
 mount -t efs ${aws_efs_file_system.efs.id}:/ /mnt/efs
 echo "${aws_efs_file_system.efs.id}:/ /mnt/efs efs defaults,_netdev 0 0" >> /etc/fstab
+echo '*/5 * * * * root /usr/bin/aws s3 sync /var/log/httpd/ s3://${aws_s3_bucket.utc_logs.bucket}/$(hostname)/ --region us-east-1' > /etc/cron.d/httpd-logs-to-s3
+chmod 644 /etc/cron.d/httpd-logs-to-s3
 EOF
 
   depends_on = [
@@ -121,6 +123,8 @@ yum install -y amazon-efs-utils
 mkdir -p /mnt/efs
 mount -t efs ${aws_efs_file_system.efs.id}:/ /mnt/efs
 echo "${aws_efs_file_system.efs.id}:/ /mnt/efs efs defaults,_netdev 0 0" >> /etc/fstab
+echo '*/5 * * * * root /usr/bin/aws s3 sync /var/log/httpd/ s3://${aws_s3_bucket.utc_logs.bucket}/$(hostname)/ --region us-east-1' > /etc/cron.d/httpd-logs-to-s3
+chmod 644 /etc/cron.d/httpd-logs-to-s3
 EOF
   depends_on = [
     aws_nat_gateway.nat_gateway_1,
